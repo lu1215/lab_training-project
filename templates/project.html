@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+        <title>CSBlab summer project</title>
+
+        <!-- Bootstrap CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+        <!-- Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous"></script>
+
+        <!-- jquery CSS -->
+        <!-- <link href="jquery.loading.css" rel="stylesheet"> -->
+        <!-- jquery, 使用 Google CDN -->
+        <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> -->
+        <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+        <!-- 若要使用jquery功能則需要另外載入jquery- UI套件 -->
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+        <!-- <script src="jquery.loading.js"></script> -->
+
+        <!-- DataTables -->
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.css">
+        <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.js"></script>
+        
+        <!-- highchart -->
+        <script src="https://code.highcharts.com/highcharts.js"></script>
+        <script src="https://code.highcharts.com/modules/xrange.js"></script>
+        <script src="https://code.highcharts.com/modules/exporting.js"></script>
+        <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+
+        <!-- d3 -->
+        <script src = "https://cdnjs.cloudflare.com/ajax/libs/d3/7.6.1/d3.min.js"></script>
+
+        <!--將外部的css檔匯入-->
+        <link rel="stylesheet" href="/static/css/project.css">
+        <!--將外部的js檔匯入 , 要放在文件尾端不然會讀不到或是要加上async-->
+
+        {% csrf_token %}
+        <script>
+            csrf_token= "{{ csrf_token }}"
+        </script>
+
+    </head>
+
+    <body>
+
+        <!-- 如果瀏覽器不支援java script時會出現此行文字 -->
+        <noscript>Sorry, your browser does not support JavaScript!</noscript>
+
+        <!-- <div class="chart1_2" style="margin:0 auto; text-align:center;">
+        </div> -->
+
+        <br>
+        <section>
+            <div id = "title" >
+                Gene Data Processing   <br>
+            </div>
+            <br>
+            <div class="spinner-grow" role="status">
+                <img src="/home/cosbi/project1/static/images/photo.jpg" alt="">
+                <br>
+                <span class="sr-only">Loading...</span>
+            </div>
+            <br>
+    
+            <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                  Search Type
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                  <li><button class="dropdown-item" id="gene_btn" href="#">Gene_ID</li>
+                  <li><button class="dropdown-item" id="trans_btn" href="#">Transcript_ID</li>
+                </ul>
+            </div>
+            <div>
+                <form class="input-group mb-3" id = "ajax_form">
+                    <!-- <label for="gene_id" class="form-label">Gene ID:</label> -->
+                    <input type="text" class="form-control" name="content" placeholder="Plaese Select Gene ID or transcript ID SearchType" aria-label="Search bar" aria-describedby="button-addon2" id="search_content" >
+                </form>
+                <button class="btn btn-outline-secondary" type="button" id="btn_search">Search</button>
+            </div>
+            
+            <hr>
+
+            <div id="text1_section">
+                <p id = "text1"></p>
+                <p id = "text2"></p>
+                <p id = "text3"></p>
+            </div>
+
+            <div id = "trans_area">
+
+                <!-- Unspliced + UTR -->
+                <p id = "table1_title"  ></p>
+                <div class="container" id="t1_container">
+                    <!-- Stack the columns on mobile by making one full-width and the other half-width -->
+                    <div class="row">
+                        <div class="col-md-8" style="margin:0; border:2px black solid;" >
+                            <!-- legend部份 -->
+                            <div style=" text-align:left;">
+                                <span style="background-color:orange ; margin:0; border:0.5px black solid;">A</span><span>&nbsp Exon</span>&nbsp;
+                                <span style="background-color:yellow ; margin:0; border:0.5px black solid;">A</span><span>&nbsp Exon</span>&nbsp;
+                                <span style = "margin:0; border:0.5px black solid;">a</span><span>&nbspIntron</span>&nbsp;
+                                <span style="background-color: gray; margin:0; border:0.5px black solid;">a</span><span>&nbsp UTR</span>&nbsp;
+                            </div>
+                            <div id="seq1">
+                                    
+                            </div>
+
+                        </div>
+                        <div class="col-6 col-md-4" id="t1">
+                            <table class="table table-striped" id="table1" style="width:auto ;"></table>
+                        </div>
+                        <br>
+                        <div class="col" style="margin:0 auto; text-align:center;">
+                            <!-- <div id="chart1"></div> -->
+                            <br>
+                            <div class="chart1_1" style="margin:0 auto; text-align:center;"  id = "chart1_area"></div><br>
+                        </div>
+                        
+                    </div>
+                </div>
+
+                <!-- Spliced + UTR -->
+                <p id = "table2_title" ></p>
+                <div class="container" id="t2_container">
+                    <!-- Stack the columns on mobile by making one full-width and the other half-width -->
+                    <div class="row">
+                        <div class="col-md-8" style="margin:0; border:2px black solid;" >
+                                <!-- legend部份 -->
+                                <div style=" text-align:left;">
+                                <span style="background-color:orange ; margin:0; border:0.5px black solid;">A</span><span>&nbspExon</span>&nbsp;
+                                <span style="background-color:yellow ; margin:0; border:0.5px black solid;">A</span><span>&nbspExon</span>&nbsp;
+                                <span style="background-color: gray; margin:0; border:0.5px black solid;">a</span><span>&nbspUTR</span>&nbsp;
+                                </div>
+                                <div id="seq2">
+                                    
+                                </div>
+                        </div>
+                        <div class="col-6 col-md-4" id="t2">
+                            <table class="table table-striped" id="table2"></table>
+                        </div>
+                        <br>
+                        <div class="col" style="margin:0 auto; text-align:center;" >
+                            <!-- <div id="chart2"></div> -->
+                            <br>
+                            <div class="chart2_1" style="margin:0 auto; text-align:center; z-index:3;" id = "chart2_1area"></div>
+                            <br>
+                            <div class="chart2_2" style="margin:0 auto; text-align:center; z-index:2;" id = "chart2_2area"></div>
+                            <br>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Conceptual translation -->
+                <p id = "table3_title" ></p>         
+                
+                <div class="row" id = "t3_container" style="z-index:1;" >
+                    <div class="col-7" id="seq3" style="margin:0; border:2px black solid; text-align:center;"></div>
+                    <div class="col-5" id="trans_table" style="margin:0; border:2px black solid; text-align:center;">
+                        <!-- <table id="table3"></table> -->
+                    </div>
+                    
+                    <!-- <div id="t3" style="margin:0 auto;">
+                        <table id="table3"></table>
+                    </div> -->
+                </div>
+
+            </div>
+        </section>
+        
+        <section>
+            <div >
+                <br><br>
+                <hr>
+                <p id="text_iframe">
+                    <samp>Search for more information in wormbase  &emsp;</samp><br>
+                    <button type="button" class="btn btn-secondary" id="hide_iframe">hide</button>&emsp;
+                    <button type="button" class="btn btn-secondary" id="appear_iframe">appear</button>
+                </p>
+            </div>
+
+            <div class="iframe">
+                <iframe src="https://wormbase.org/#012-34-5" id="moreinfo" title="more information : wormbase"></iframe>
+                <br>
+            </div>
+        </section>
+        
+        <footer class="py-4 mt-5 text-center text-muted bg-light border-top">
+            Created by Cosbi Lab &copy; 2022
+        </footer>
+        
+
+    </body>
+    <script type="text/javascript" src="/static/js/project.js" async></script>
+
+</html>

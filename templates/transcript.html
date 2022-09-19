@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} transcript {% endblock %}
+{% block content %}
+<div class="container">
+    <div>{{ name }}</div>
+    
+    <div id = "trans_area">
+        <!-- Unspliced + UTR -->
+        <p id = "table1_title"  ></p>
+        <div class="container" id="t1_container">
+            <!-- Stack the columns on mobile by making one full-width and the other half-width -->
+            <div class="row">
+                <div class="col-md-8" style="margin:0; border:2px black solid;" >
+                    <!-- legend部份 -->
+                    <div style=" text-align:left;">
+                        <span style="background-color:orange ; margin:0; border:0.5px black solid;">A</span><span>&nbsp Exon</span>&nbsp;
+                        <span style="background-color:yellow ; margin:0; border:0.5px black solid;">A</span><span>&nbsp Exon</span>&nbsp;
+                        <span style = "margin:0; border:0.5px black solid;">a</span><span>&nbspIntron</span>&nbsp;
+                        <span style="background-color: gray; margin:0; border:0.5px black solid;">a</span><span>&nbsp UTR</span>&nbsp;
+                    </div>
+                    <div id="seq1"></div>
+
+                </div>
+                <div class="col-6 col-md-4" id="t1">
+                    <table class="table table-striped" id="table1" style="width:auto ;"></table>
+                </div>
+                <br>
+                <div class="col" style="margin:0 auto; text-align:center;">
+                    <!-- <div id="chart1"></div> -->
+                    <br>
+                    <div class="chart1_1" style="margin:0 auto; text-align:center;"  id = "chart1_area"></div><br>
+                </div>
+            </div>
+        </div>
+
+        <!-- Spliced + UTR -->
+        <p id = "table2_title" ></p>
+        <div class="container" id="t2_container">
+            <div class="row">
+                <div class="col-md-8" style="margin:0; border:2px black solid;" >
+                        <!-- legend部份 -->
+                        <div style=" text-align:left;">
+                        <span style="background-color:orange ; margin:0; border:0.5px black solid;">A</span><span>&nbspExon</span>&nbsp;
+                        <span style="background-color:yellow ; margin:0; border:0.5px black solid;">A</span><span>&nbspExon</span>&nbsp;
+                        <span style="background-color: gray; margin:0; border:0.5px black solid;">a</span><span>&nbspUTR</span>&nbsp;
+                        </div>
+                        <div id="seq2">
+                            
+                        </div>
+                </div>
+                <div class="col-6 col-md-4" id="t2">
+                    <table class="table table-striped" id="table2"></table>
+                </div>
+                <br>
+                <div class="col" style="margin:0 auto; text-align:center;" >
+                    <!-- <div id="chart2"></div> -->
+                    <br>
+                    <div class="chart2_1" style="margin:0 auto; text-align:center; z-index:3;" id = "chart2_1area"></div>
+                    <br>
+                    <div class="chart2_2" style="margin:0 auto; text-align:center; z-index:2;" id = "chart2_2area"></div>
+                    <br>
+
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Conceptual translation -->
+        <p id = "table3_title" ></p>         
+        
+        <div class="row" id = "t3_container" style="z-index:1;" >
+            <div class="col-7" id="seq3" style="margin:0; border:2px black solid; text-align:center;"></div>
+            <div class="col-5" id="trans_table" style="margin:0; border:2px black solid; text-align:center;">
+                <!-- <table id="table3"></table> -->
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="/static/js/project.js" async></script>
+    <!-- <script type="text/javascript" src="/static/js/transcript.js" async></script> -->
+</div>
+{% endblock %}

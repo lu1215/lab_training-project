@@ -1,0 +1,31 @@
+<!-- index.html -->
+
+<!-- 繼承base內容 -->
+{% extends 'base.html' %} 
+{% load static %}
+{% block title %} home  {% endblock %}
+{% block content %}
+<div class="container">
+    <img src="{% static 'images/gene_structure.png' %}" class="figure-img img-fluid mb-5">
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Gene ID </th>
+                <th scope="col">Transcript ID</th>
+                <th scope="col">numbers</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for gene in genes %}
+            <tr>
+                <th scope="row">{{ forloop.counter }}</th>
+                <td>{{ gene.gene_id }}</td>
+                <td>{{ gene.transcript_id | cut:"'" }}</td>
+                <td>{{ gene.numbers }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
