@@ -527,6 +527,7 @@ def crawler_gene(request):
     query = str(request.POST['content'])
     # query = "WBGene00000006"
     # query = "WBGene00006962"
+    # query = "WBGene00002285" #會有問題,因其表格有兩種形式
     # 靜態爬蟲抓取transcript清單
     resp = requests.get(
         "https://wormbase.org/rest/widget/gene/{}/sequences".format(query),
@@ -539,17 +540,50 @@ def crawler_gene(request):
     data = data["fields"]["gene_models"]['data']["table"]
     data_type = []
     data_transname = []
+    data_Tlen = []
+    data_CDS = []
+    data_Clen = []
+    data_Protein = []
+    data_PLen = []
     for i in range(len(data)):
         data_type.append(str(data[i]['type']))
-        # 若為"non coding transcript"不進行胺基酸序列分析 
-        # 若為"['Coding transcript']"則須進行胺基酸序列分析
+    # 若為"non coding transcript"不進行胺基酸序列分析 
+    # 若為"['Coding transcript']"則須進行胺基酸序列分析
     for i in range(len(data)):
         if data_type[i] == "['Coding transcript']":
             data_transname.append(data[i]['model'][0]["id"])
         else:
             data_transname.append(data[i]['model']["id"])
-            
-    return JsonResponse({0: data_transname ,1: data_type})
+    
+    # 處理cds資料
+    for i in range(len(data)):
+        if str(data[i]['cds']) == '(no CDS)':
+            data_CDS.append(str(data[i]['cds']))
+        else:
+            data_CDS.append(str(data[i]['cds']['text']['label']))
+    # 處理transcript 長度資料
+    for i in range(len(data)):
+        if data_type[i] == "['Coding transcript']":
+            data_Tlen.append(data[i]["length_unspliced"][0])
+        else:
+            data_Tlen.append(data[i]["length_unspliced"])
+    # 處理cds長度資料
+    for i in range(len(data)):
+        data_Clen.append(str(data[i]["length_spliced"]))
+    # 處理protein資料
+    for i in range(len(data)):
+        if data_type[i] == "['Coding transcript']":
+            data_Protein.append(data[i]["protein"]["label"])
+        else:
+            data_Protein.append("-")
+    # 處理protein 長度資料
+    for i in range(len(data)):
+        if data_type[i] == "['Coding transcript']":
+            data_PLen.append(data[i]["length_protein"])
+        else:
+            data_PLen.append("-")
+
+    return JsonResponse({0: data_transname, 1: data_type, 2:data_Tlen, 3:data_CDS, 4:data_Clen, 5:data_Protein, 6:data_PLen})
 
 
 def crawler_and_processing(request):

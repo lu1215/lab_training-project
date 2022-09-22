@@ -36,13 +36,60 @@ $(document).ready(function(){
 				data: $('#search_content').serialize(), //在input 的地方需要加入name:gene_id 否則此處會錯誤
 				success: function(response){ 
 					$("#text1").text( $("#search_content").val() );
+					$("#all_trans_table").css("display","block")
 					var data_transname = response[0];
 					var data_type = response[1];
+					var data_Tlen = response[2];
+					var data_CDS = response[3];
+					var data_Clen = response[4];
+					var data_Protein = response[5];
+					var data_Plen = response[6];
+					var dataset = [];
+					
+					// $('#all_trans_table').append("<tbody>");
 					for(var i = 0; i < data_transname.length; i++){
-						$('#text1_section').append("<button class=\"btn btn-info\" name = \' new_content \' type=\"button\" id=\""+ data_transname[i] +"\" value=\""+ data_type[i] +"\">"+ data_transname[i] +"</button>" + "\&nbsp;")
-						// $('#text1_section').append("<a  href=\"transcript_pages/ \" class=\"btn btn-info\" name = \" content \" type=\"button\" id=\""+ data_transname[i] +"\" value=\""+ data_type[i] +"\">"+ data_transname[i] +"</a>" + "\&nbsp;")
-
+						dataset.push(
+							[
+								data_transname[i],
+								data_type[i],
+								data_Tlen[i],
+								data_CDS[i],
+								data_Clen[i],
+								data_Protein[i],
+						 		data_Plen[i],
+							]
+						)
 					}
+					$("#all_trans_table").DataTable({
+						destroy : true,
+						data: dataset,
+						// <td></td>
+                        //     <td>Type</td>
+                        //     <td>Transcript Length (nt)</td>
+                        //     <td>Coding Sequence (CDS)</td>
+                        //     <td>Coding Sequence Length (nt)	</td>
+                        //     <td>Protein</td>
+                        //     <td>Protein Length (aa)</td>
+						
+						
+						columns:[
+							{ title: 'Transcript' },
+							{ title: 'type'},
+							{ title: 'Transcript Length (nt)' },
+							{ title: 'Coding Sequence (CDS)' },
+							{ title: 'Coding Sequence Length (nt)'},
+							{ title: 'Protein'},
+							{ title: 'Protein Length (aa)'}
+						],
+						columnDefs: [{
+							//   指定第一列，从0开始，0表示第一列，1表示第二列……
+							targets: 0,
+							render: function(data) {
+								return '<button class = "btn btn-info" " />'  + data +  '</button>'
+							}
+						}],
+					});
+
 				},
 				error: function(){
 					alert('Finding Gene id data error');
@@ -218,7 +265,6 @@ $(document).ready(function(){
 			// }) 
 			
 			//利用d3劃出結構圖
-			
 			$.ajax({
 				headers: { 'X-CSRFToken': csrf_token },
 				url: '/web_tool/d3_graph/', 
@@ -947,7 +993,7 @@ $(document).ready(function(){
 			$("#text1").text("Plaese Select search type");
 		}
 		// 如果是在程式執行中新增的按鈕要使用 需用js的用法
-		$(document).on('click','.btn-info',function(e){
+		$(document).on('click','.sorting_1',function(e){
 			var name = $(this).html();
 			var type = $(this).val();
 			// alert(name)
@@ -1102,7 +1148,6 @@ $(document).ready(function(){
 			}) 
 			
 			//利用d3劃出結構圖
-			
 			$.ajax({
 				headers: { 'X-CSRFToken': csrf_token },
 				url: '/web_tool/d3_graph/', 
@@ -1454,6 +1499,7 @@ $(document).ready(function(){
 				}
 			})
 	
+			//資料回傳與繪製datatable
 			$.ajax({
 				headers: { 'X-CSRFToken': csrf_token },
 				url: '/web_tool/show_data/', 
