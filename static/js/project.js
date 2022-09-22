@@ -1134,29 +1134,18 @@ $(document).ready(function(){
 					}
 		
 					var tooltipData = [];
-					if( name1[ len1.length - 1] == "3'UTR"){
-						tooltipData.push({
-							"x": 800 * (start1[len1.length - 1] -1 )/total_len1,
-							"y": 0,
-							"start": start1[len1.length - 1],
-							"end": end1[len1.length - 1],
-							"name": name1[len1.length - 1],
-							"len": len1[len1.length - 1],
-							"width": 800 * len1[len1.length - 1]/total_len1,
-							"height": 25,
-							"color":"grey",
-						})
-					}
 		
 					for(var i = 0; i < len1.length; i++ ){
-						var color = "white"
-						if(name1[i] == "3'UTR"){
+						var color = "black";
+						var y = 10;
+						var h = 5;
+
+						if(name1[i] == "3'UTR" || name1[i] == "5'UTR"){
 							continue;
 						}
-						if(name1[i] == "5'UTR"){
-							color = "grey"
-						}
 						else if( name1[i][0] == "E" ){
+							y = 0;
+							h = 25;
 							var x = parseInt(name1[i][name1[i].length -1]);
 							if (x % 2 == 0){
 								color = "orange";
@@ -1165,19 +1154,38 @@ $(document).ready(function(){
 								color = "yellow";
 							}
 						}
-		
 						tooltipData.push({
-							"x": 800 * (start1[ i ] -1 )/total_len1,
-							"y": 0,
-							"start": start1[ i ],
+							"x": 800 * start1[i]/total_len1,
+							"y": y,
+							"start": start1[i],
 							"end": end1[i],
 							"name": name1[i],
 							"len": len1[i],
 							"width": 800 * len1[i]/total_len1,
-							"height": 25,
+							"height": h,
 							"color": color,
 						})
 					}
+					// 處理5'utr 3'utr資料在後才能與exon資料重疊
+					for(var i = 0; i < len1.length; i++ ){
+						if(name1[i] == "3'UTR" || name1[i] == "5'UTR"){
+							tooltipData.push({
+								"x": 800 * start1[i]/total_len1,
+								"y": 5,
+								"start": start1[i],
+								"end": end1[i],
+								"name": name1[i],
+								"len": len1[i],
+								"width": 800 * len1[i]/total_len1,
+								"height": 15,
+								"color": "gray",
+							})
+						}
+						else{
+							continue;
+						}
+					}
+
 					// console.log(tooltipData);
 		
 					d3.select('.chart1_1').style('position', 'relative')
@@ -1186,7 +1194,7 @@ $(document).ready(function(){
 								.append('svg')
 								.attr('width', 800)
 								.attr('height', 25)
-								.attr("style", "outline: thin solid black;")
+								// .attr("style", "outline: thin solid black;")
 								.selectAll('rect')
 								.data(tooltipData)
 								.enter()
@@ -1196,7 +1204,7 @@ $(document).ready(function(){
 								.attr("width", d => d.width )
 								.attr("height", d => d.height )
 								.attr("fill", d => d.color)
-								.attr("style", "outline: thin solid black;")
+								// .attr("style", "outline: thin solid black;")
 								.style('cursor', 'pointer');
 		
 					// 建立tooltips
@@ -1231,104 +1239,102 @@ $(document).ready(function(){
 						})
 		
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-						// 圖2 整組資料綁製svg
-						var tooltipData2 = [];
+						// 圖2 整組資料綁製svg(utr + cds)
 						total_len2 = 0;
 						for(var i =0; i < len2.length; i++){
 							if(name2[i] == "3'UTR" || name2[i] == "5'UTR" || name2[i] == "CDS"){
 								total_len2 += len2[i];
 							}
 						}
-		
-						for(var i = 0; i < len2.length; i++ ){
-							var color = "grey";
-		
-							if(name2[i] == "5'UTR" || name2[i] == "3'UTR"){
-								color = "grey"
-								tooltipData2.push({
-									"x": 800 * (start2[i] -1 )/total_len2,
-									"y": 0,
-									"start": start2[ i ],
-									"end": end2[i],
-									"name": name2[i],
-									"len": len2[i],
-									"width": 800 * len2[i]/total_len2,
-									"height": 25,
-									"color": color,
-								})
+						if (type == "['Coding transcript']"){
+							var tooltipData2 = [];
+							for(var i = 0; i < len2.length; i++ ){
+								var color = "grey";
+			
+								if(name2[i] == "5'UTR" || name2[i] == "3'UTR"){
+									color = "grey"
+									tooltipData2.push({
+										"x": 800 * (start2[i] -1 )/total_len2,
+										"y": 0,
+										"start": start2[ i ],
+										"end": end2[i],
+										"name": name2[i],
+										"len": len2[i],
+										"width": 800 * len2[i]/total_len2,
+										"height": 25,
+										"color": color,
+									})
+								}
+								else if( name2[i] == "CDS" ){
+									color = "green"
+									tooltipData2.push({
+										"x": 800 * (start2[i] -1 )/total_len2,
+										"y": 0,
+										"start": start2[i],
+										"end": end2[i],
+										"name": name2[i],
+										"len": len2[i],
+										"width": 800 * len2[i]/total_len2,
+										"height": 25,
+										"color": color,
+									})
+								}
+								else{
+									continue;
+								}
 							}
-							else if( name2[i] == "CDS" ){
-								color = "green"
-								tooltipData2.push({
-									"x": 800 * (start2[i] -1 )/total_len2,
-									"y": 0,
-									"start": start2[i],
-									"end": end2[i],
-									"name": name2[i],
-									"len": len2[i],
-									"width": 800 * len2[i]/total_len2,
-									"height": 25,
-									"color": color,
-								})
-							}
-							else{
-								continue;
-							}
-		
+							// console.log(tooltipData);
+			
+							d3.select('.chart2_1').style('position', 'relative')
+			
+							const dots2 = d3.select('.chart2_1')
+									.append('svg')
+									.attr('width', 800)
+									.attr('height', 25)
+									// .attr("style", "outline: thin solid black;")
+									.selectAll('rect')
+									.data(tooltipData2)
+									.enter()
+									.append('rect')
+									.attr("x", d => d.x)
+									.attr("y", d => d.y )
+									.attr("width", d => d.width )
+									.attr("height", d => d.height )
+									.attr("fill", d => d.color)
+									// .attr("style", "outline: thin solid black;")
+									.style('cursor', 'pointer');
 							
+							// 建立tooltips
+							const tooltips2 = d3.select(".chart2_1")
+												.append("div")
+												.style("opacity", 0)
+												.style('position', 'absolute')
+												.attr("class", "tooltip2")
+												.style("background-color", "white")
+												.style("border", "solid")
+												.style("border-width", "2px")
+												.style("border-radius", "5px")
+												.style("padding", "5px")
+							
+							dots2.on('mouseover', function(){
+								tooltips2.style("opacity", 1) // 顯示tooltip
+								})
+								.on('mousemove', function(d){
+									let pt = d3.pointer(this) // 抓圓點位置
+									tooltips2.style("opacity", 1)
+										.style('left',  (d.target.__data__.x + d.target.__data__.width / 2) +240 + "px" ) // 設定tooltips位置
+										// .style('top',  parseInt(d.target.__data__.y) )
+										.html(
+											"<p>" + "name: " + d.target.__data__.name + "</p>" + 
+											"<p>" +  d.target.__data__.start + " - " +  d.target.__data__.end + "</p>" +
+											"<p>" + "length: " +  d.target.__data__.len + "</p>"
+										) // 抓到綁定在DOM元素的資料
+								})
+								.on('mouseleave', function(){
+									// 滑鼠離開圖形時，tooltip消失
+									tooltips2.style("opacity", 0)
+								})
 						}
-						// console.log(tooltipData);
-		
-						d3.select('.chart2_1').style('position', 'relative')
-		
-						const dots2 = d3.select('.chart2_1')
-								.append('svg')
-								.attr('width', 800)
-								.attr('height', 25)
-								.attr("style", "outline: thin solid black;")
-								.selectAll('rect')
-								.data(tooltipData2)
-								.enter()
-								.append('rect')
-								.attr("x", d => d.x)
-								.attr("y", d => d.y )
-								.attr("width", d => d.width )
-								.attr("height", d => d.height )
-								.attr("fill", d => d.color)
-								.attr("style", "outline: thin solid black;")
-								.style('cursor', 'pointer');
-		
-						// 建立tooltips
-						const tooltips2 = d3.select(".chart2_1")
-											.append("div")
-											.style("opacity", 0)
-											.style('position', 'absolute')
-											.attr("class", "tooltip2")
-											.style("background-color", "white")
-											.style("border", "solid")
-											.style("border-width", "2px")
-											.style("border-radius", "5px")
-											.style("padding", "5px")
-						
-						dots2.on('mouseover', function(){
-							tooltips2.style("opacity", 1) // 顯示tooltip
-							})
-							.on('mousemove', function(d){
-								let pt = d3.pointer(this) // 抓圓點位置
-								tooltips2.style("opacity", 1)
-									.style('left',  (d.target.__data__.x + d.target.__data__.width / 2) +240 + "px" ) // 設定tooltips位置
-									// .style('top',  parseInt(d.target.__data__.y) )
-									.html(
-										"<p>" + "name: " + d.target.__data__.name + "</p>" + 
-										"<p>" +  d.target.__data__.start + " - " +  d.target.__data__.end + "</p>" +
-										"<p>" + "length: " +  d.target.__data__.len + "</p>"
-									) // 抓到綁定在DOM元素的資料
-							})
-							.on('mouseleave', function(){
-								// 滑鼠離開圖形時，tooltip消失
-								tooltips2.style("opacity", 0)
-							})
-	
 						/////////////////////////////////////////////////////////
 						// 圖2-2 整組資料綁製svg
 			
@@ -1373,13 +1379,33 @@ $(document).ready(function(){
 								"color": color,
 							})
 						}
+						// 處理5'utr 3'utr資料在後才能與exon資料重疊
+						for(var i = 0; i < len2.length; i++ ){
+							if(name2[i] == "3'UTR" || name2[i] == "5'UTR"){
+								tooltipData2_2.push({
+									"x": 800 * (start2[ i ] -1 )/total_len2,
+									"y": 5,
+									"start": start2[ i ],
+									"end": end2[i],
+									"name": name2[i],
+									"len": len2[i],
+									"width": 800 * len2[i]/total_len2,
+									"height": 15,
+									"color": "gray",
+								})
+							}
+							else{
+								continue;
+							}
+						}
+
 						d3.select('.chart2_2').style('position', 'relative')
 		
 						const dots2_2 = d3.select('.chart2_2')
 								.append('svg')
 								.attr('width', 800)
 								.attr('height', 25)
-								.attr("style", "outline: thin solid black;")
+								// .attr("style", "outline: thin solid black;")
 								.selectAll('rect')
 								.data(tooltipData2_2)
 								.enter()
@@ -1389,7 +1415,7 @@ $(document).ready(function(){
 								.attr("width", d => d.width )
 								.attr("height", d => d.height )
 								.attr("fill", d => d.color)
-								.attr("style", "outline: thin solid black;")
+								// .attr("style", "outline: thin solid black;")
 								.style('cursor', 'pointer');
 		
 						// 建立tooltips
