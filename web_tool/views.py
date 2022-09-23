@@ -529,12 +529,39 @@ def crawler_gene(request):
     # query = "WBGene00006962"
     # query = "WBGene00002285" #會有問題,因其表格有兩種形式
     # 靜態爬蟲抓取transcript清單
-    resp = requests.get(
-        "https://wormbase.org/rest/widget/gene/{}/sequences".format(query),
-        headers={
-            "User-Agent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36"
-        })
-    soup = BeautifulSoup(resp.text, "html.parser")
+    
+    
+    if query[0:3] == "WBG":
+        # 靜態爬蟲抓取transcript清單
+        resp = requests.get(
+            "https://wormbase.org/rest/widget/gene/{}/sequences".format(query),
+            headers={
+                "User-Agent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36"
+            })
+        soup = BeautifulSoup(resp.text, "html.parser")
+        # data = soup.find_all('a',{'class':'transcript-link'})
+    else:
+        chrome_options = webdriver.ChromeOptions()
+        # 增加使用者電腦瀏覽器資訊 
+        chrome_options.add_argument("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36")
+        # 避免彈出視窗影響爬蟲表現
+        chrome_options.add_argument("--disable-notifications")
+        # 使瀏覽器不出現
+        chrome_options.add_argument("--headless")
+        path = "/home/cosbi/Documents/Web Crawler/chromedriver"
+        browser = webdriver.Chrome( path, options=chrome_options)
+
+        browser.get('https://wormbase.org/species/c_elegans/gene/{}'.format(query))
+        time.sleep(1)
+        query = str(browser.find_element(By.XPATH, '//*[@id="overview-content"]/div[2]/div[1]/div/div[15]/div[2]').text)
+        
+        resp = requests.get(
+            "https://wormbase.org/rest/widget/gene/{}/sequences".format(query),
+            headers={
+                "User-Agent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36"
+            })
+        
+        soup = BeautifulSoup(resp.text, "html.parser")
 
     data = json.loads(str(soup))
     data = data["fields"]["gene_models"]['data']["table"]
@@ -583,7 +610,7 @@ def crawler_gene(request):
         else:
             data_PLen.append("-")
 
-    return JsonResponse({0: data_transname, 1: data_type, 2:data_Tlen, 3:data_CDS, 4:data_Clen, 5:data_Protein, 6:data_PLen})
+    return JsonResponse({0: data_transname, 1: data_type, 2:data_Tlen, 3:data_CDS, 4:data_Clen, 5:data_Protein, 6:data_PLen,7: query})
 
 
 def crawler_and_processing(request):

@@ -35,8 +35,15 @@ $(document).ready(function(){
 				url: '/web_tool/crawler_gene/', 
 				data: $('#search_content').serialize(), //在input 的地方需要加入name:gene_id 否則此處會錯誤
 				success: function(response){ 
-					$("#text1").text( $("#search_content").val() );
+					var query = response[7];
+					if (query != $("#search_content").val() ){
+						$("#text1").text( $("#search_content").val() +  "  (" + query + ") ");
+					} 
+					else{
+						$("#text1").text( $("#search_content").val());
+					}
 					$("#all_trans_table").css("display","block")
+					
 					var data_transname = response[0];
 					var data_type = response[1];
 					var data_Tlen = response[2];
@@ -1561,7 +1568,7 @@ $(document).ready(function(){
 						],
 					});
 					if(type == "['Coding transcript']"){
-						alert("into coding")
+
 						$("#table3_title").text("Conceptual translation")
 						$("#table3_title").addClass("alert alert-success")
 						var body3 = response[2][0];
