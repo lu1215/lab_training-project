@@ -902,7 +902,7 @@ def crawler_and_processing(request):
             i =0
             for element in amino_acid_final_list:
                 f.write(element)
-    
+
     return JsonResponse({0:seq ,1:type1 ,2:seq2, 3:seq_color2})
 
 def show_data(request):

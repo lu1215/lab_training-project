@@ -73,19 +73,26 @@ $(document).ready(function(){
 						
 						
 						columns:[
-							{ title: 'Transcript' },
+							{ title: 'Transcript'},
 							{ title: 'type'},
-							{ title: 'Transcript Length (nt)' },
-							{ title: 'Coding Sequence (CDS)' },
+							{ title: 'Transcript Length (nt)'},
+							{ title: 'Coding Sequence (CDS)'},
 							{ title: 'Coding Sequence Length (nt)'},
 							{ title: 'Protein'},
-							{ title: 'Protein Length (aa)'}
+							{ title: 'Protein Length (aa)'},
+							// { data: 'data_transname'},
+							// { data: 'data_type'},
+							// { data:  'data_Tlen'},
+							// { data:  'data_CDS'},
+							// { data: 'data_Clen'},
+							// { data: 'data_Protein'},
+							// { data: 'data_Plen'}
 						],
 						columnDefs: [{
-							//   指定第一列，从0开始，0表示第一列，1表示第二列……
+							//   指定第一列，從0開始，0表示第一列，1表示第二列……
 							targets: 0,
-							render: function(data) {
-								return '<button class = "btn btn-info" " />'  + data +  '</button>'
+							render: function(data, type, row, meta) {
+								return '<button class = "btn btn-info" value = "'+ row[1] + '" />'  + data +  '</button>'
 							}
 						}],
 					});
@@ -993,9 +1000,10 @@ $(document).ready(function(){
 			$("#text1").text("Plaese Select search type");
 		}
 		// 如果是在程式執行中新增的按鈕要使用 需用js的用法
-		$(document).on('click','.sorting_1',function(e){
+		$(document).on('click','.btn-info',function(e){
 			var name = $(this).html();
 			var type = $(this).val();
+			// alert(type)
 			// alert(name)
 			// alert(type)
 			$('#text1_section').html("<div>"+ name +"</div>")
@@ -1553,6 +1561,7 @@ $(document).ready(function(){
 						],
 					});
 					if(type == "['Coding transcript']"){
+						alert("into coding")
 						$("#table3_title").text("Conceptual translation")
 						$("#table3_title").addClass("alert alert-success")
 						var body3 = response[2][0];
