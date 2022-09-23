@@ -762,7 +762,7 @@ def crawler_and_processing(request):
 
     for i in range(len(Name)):
         if i == 0: 
-            pass
+            continue
         if Name[i][0:4] == "Exon" and (Name[i-1] == "5'UTR" or Name[i-1] == "3'UTR" ):
             Start[i] = Start[i-1]
         if i == len(Name)-1:
