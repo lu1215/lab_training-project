@@ -532,123 +532,123 @@ def crawler_gene(request):
     
     
     if query[0:3] == "WBG":
-    # 靜態爬蟲抓取transcript清單
-    resp = requests.get(
-        "https://wormbase.org/rest/widget/gene/{}/sequences".format(query),
-        headers={
-            "User-Agent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36"
-        })
-    soup = BeautifulSoup(resp.text, "html.parser")
-    # data = soup.find_all('a',{'class':'transcript-link'})
-else:
-    chrome_options = webdriver.ChromeOptions()
-    # 增加使用者電腦瀏覽器資訊 
-    chrome_options.add_argument("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36")
-    # 避免彈出視窗影響爬蟲表現
-    chrome_options.add_argument("--disable-notifications")
-    # 使瀏覽器不出現
-    chrome_options.add_argument("--headless")
-    path = "/home/cosbi/Documents/Web Crawler/chromedriver"
-    browser = webdriver.Chrome( path, options=chrome_options)
+        # 靜態爬蟲抓取transcript清單
+        resp = requests.get(
+            "https://wormbase.org/rest/widget/gene/{}/sequences".format(query),
+            headers={
+                "User-Agent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36"
+            })
+        soup = BeautifulSoup(resp.text, "html.parser")
+        # data = soup.find_all('a',{'class':'transcript-link'})
+    else:
+        chrome_options = webdriver.ChromeOptions()
+        # 增加使用者電腦瀏覽器資訊 
+        chrome_options.add_argument("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36")
+        # 避免彈出視窗影響爬蟲表現
+        chrome_options.add_argument("--disable-notifications")
+        # 使瀏覽器不出現
+        chrome_options.add_argument("--headless")
+        path = "/home/cosbi/Documents/Web Crawler/chromedriver"
+        browser = webdriver.Chrome( path, options=chrome_options)
 
-    browser.get('https://wormbase.org/species/c_elegans/gene/{}'.format(query))
-    time.sleep(1)
-    data = str(browser.find_element(By.XPATH, '//*[@id="overview-content"]/div[2]/div[1]/div/div[15]/div[2]').text)
-    
-    resp = requests.get(
-        "https://wormbase.org/rest/widget/gene/{}/sequences".format(data),
-        headers={
-            "User-Agent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36"
-        })
-    
-    soup = BeautifulSoup(resp.text, "html.parser")
-
-
-
-data = json.loads(str(soup))
-# print(data)
-
-
-# # 處理單純只有coding與non coding的資料
-print("-----------------------------")
-# data_tp = data[""]
-data = data["fields"]["gene_models"]['data']["table"]
-print(data)
-
-data_transname = []
-data_type = []
-data_Tlen = []
-data_CDS = []
-data_Clen = []
-data_Protein = []
-data_Plen = []
-
-if "Pseudogene" in data[0]["type"]:
-    length_data = len(data[0]["type"])
-    
-    for i in range(length_data):
-        data_type.append(data[0]["type"][i])
-        data_transname.append(data[0]['model'][i]["id"])
-        data_CDS.append('(no CDS)')
-        data_Clen.append('-')
-        data_Protein.append("-")
-        data_Plen.append('-')
+        browser.get('https://wormbase.org/species/c_elegans/gene/{}'.format(query))
+        time.sleep(1)
+        data = str(browser.find_element(By.XPATH, '//*[@id="overview-content"]/div[2]/div[1]/div/div[15]/div[2]').text)
         
-else:
-    length_data = len(data)
-    # 處裡type資料
-    for i in range(length_data):
-        data_type.append(str(data[i]['type']))
-
-        if data_type[i][0] =="[":
-            if data_type[i][2] == "C":
-                for j in range(len(data_type[i].split(","))):
-                    element = data_type[i].split(",")[j].replace("[",'').replace("]",'').replace("'","")
-                    data_type.append(element)
-                data_type.pop(i)
-                i += len(data_type[i].split(","))
-            else:
-                data_type.pop(i)
-                length_data -= 1
+        resp = requests.get(
+            "https://wormbase.org/rest/widget/gene/{}/sequences".format(data),
+            headers={
+                "User-Agent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36"
+            })
         
-    # 若為"non coding transcript"不進行胺基酸序列分析 
-    # 若為"['Coding transcript']"則須進行胺基酸序列分析
-    for i in range(length_data):
-        if data_type[i] == 'non coding transcript':
-            data_transname.append(data[i]['model']["id"])
-            # print(data_transname[i])
-        elif data_type[i] == 'Coding transcript':
-            data_transname.append(data[i]['model'][0]["id"])
-        else:
-            data_transname.append(data[i]['model']["id"])
+        soup = BeautifulSoup(resp.text, "html.parser")
 
-    # 處理cds資料
-    for i in range(length_data):
-        if str(data[i]['cds']) == '(no CDS)':
-            data_CDS.append(str(data[i]['cds']))
-        else:
-            data_CDS.append(str(data[i]['cds']['text']['label']))
-    # 處理transcript 長度資料
-    for i in range( length_data):
-        if data_type[i] == 'Coding transcript':
-            data_Tlen.append(data[i]["length_unspliced"][0])
-        else:
-            data_Tlen.append(data[i]["length_unspliced"])
-    # 處理cds長度資料
-    for i in range( length_data):
-        data_Clen.append(str(data[i]["length_spliced"]))
-    # 處理protein資料
-    for i in range( length_data):
-        if data_type[i] == 'Coding transcript':
-            data_Protein.append(data[i]["protein"]["label"])
-        else:
+
+
+    data = json.loads(str(soup))
+    # print(data)
+
+
+    # # 處理單純只有coding與non coding的資料
+    print("-----------------------------")
+    # data_tp = data[""]
+    data = data["fields"]["gene_models"]['data']["table"]
+    print(data)
+
+    data_transname = []
+    data_type = []
+    data_Tlen = []
+    data_CDS = []
+    data_Clen = []
+    data_Protein = []
+    data_Plen = []
+
+    if "Pseudogene" in data[0]["type"]:
+        length_data = len(data[0]["type"])
+        
+        for i in range(length_data):
+            data_type.append(data[0]["type"][i])
+            data_transname.append(data[0]['model'][i]["id"])
+            data_CDS.append('(no CDS)')
+            data_Clen.append('-')
             data_Protein.append("-")
-    # 處理protein 長度資料
-    for i in range( length_data):
-        if data_type[i] == 'Coding transcript':
-            data_Plen.append(data[i]["length_protein"])
-        else:
-            data_Plen.append("-")
+            data_Plen.append('-')
+            
+    else:
+        length_data = len(data)
+        # 處裡type資料
+        for i in range(length_data):
+            data_type.append(str(data[i]['type']))
+
+            if data_type[i][0] =="[":
+                if data_type[i][2] == "C":
+                    for j in range(len(data_type[i].split(","))):
+                        element = data_type[i].split(",")[j].replace("[",'').replace("]",'').replace("'","")
+                        data_type.append(element)
+                    data_type.pop(i)
+                    i += len(data_type[i].split(","))
+                else:
+                    data_type.pop(i)
+                    length_data -= 1
+            
+        # 若為"non coding transcript"不進行胺基酸序列分析 
+        # 若為"['Coding transcript']"則須進行胺基酸序列分析
+        for i in range(length_data):
+            if data_type[i] == 'non coding transcript':
+                data_transname.append(data[i]['model']["id"])
+                # print(data_transname[i])
+            elif data_type[i] == 'Coding transcript':
+                data_transname.append(data[i]['model'][0]["id"])
+            else:
+                data_transname.append(data[i]['model']["id"])
+
+        # 處理cds資料
+        for i in range(length_data):
+            if str(data[i]['cds']) == '(no CDS)':
+                data_CDS.append(str(data[i]['cds']))
+            else:
+                data_CDS.append(str(data[i]['cds']['text']['label']))
+        # 處理transcript 長度資料
+        for i in range( length_data):
+            if data_type[i] == 'Coding transcript':
+                data_Tlen.append(data[i]["length_unspliced"][0])
+            else:
+                data_Tlen.append(data[i]["length_unspliced"])
+        # 處理cds長度資料
+        for i in range( length_data):
+            data_Clen.append(str(data[i]["length_spliced"]))
+        # 處理protein資料
+        for i in range( length_data):
+            if data_type[i] == 'Coding transcript':
+                data_Protein.append(data[i]["protein"]["label"])
+            else:
+                data_Protein.append("-")
+        # 處理protein 長度資料
+        for i in range( length_data):
+            if data_type[i] == 'Coding transcript':
+                data_Plen.append(data[i]["length_protein"])
+            else:
+                data_Plen.append("-")
 
     return JsonResponse({0: data_transname, 1: data_type, 2:data_Tlen, 3:data_CDS, 4:data_Clen, 5:data_Protein, 6:data_PLen,7: query})
 
