@@ -563,18 +563,13 @@ def crawler_gene(request):
         
         soup = BeautifulSoup(resp.text, "html.parser")
 
-
-
     data = json.loads(str(soup))
     # print(data)
 
-
     # # 處理單純只有coding與non coding的資料
-    print("-----------------------------")
     # data_tp = data[""]
     data = data["fields"]["gene_models"]['data']["table"]
-    print(data)
-
+    
     data_transname = []
     data_type = []
     data_Tlen = []
@@ -650,7 +645,7 @@ def crawler_gene(request):
             else:
                 data_Plen.append("-")
 
-    return JsonResponse({0: data_transname, 1: data_type, 2:data_Tlen, 3:data_CDS, 4:data_Clen, 5:data_Protein, 6:data_PLen,7: query})
+    return JsonResponse({0: data_transname, 1: data_type, 2:data_Tlen, 3:data_CDS, 4:data_Clen, 5:data_Protein, 6:data_Plen,7: query})
 
 
 def crawler_and_processing(request):
@@ -891,7 +886,7 @@ def crawler_and_processing(request):
     seq2 = list(spliced["seq"])
     seq_color2 = list(spliced["type1"])
 
-    if query2 == "['Coding transcript']":
+    if query2 == "Coding transcript":
         amino_acid = []
         amino_acid.append("".join(seq))
         # print(amino_acid)
@@ -998,7 +993,7 @@ def show_data(request):
 
     # print(body)
     # print(len(df4[0][0]))
-    if query2 == "['Coding transcript']":
+    if query2 == "Coding transcript":
         df4 = pd.read_csv('data/hw4.txt',header=None)
         body3 = df4.values.tolist()
         body3 = list(body3[0])

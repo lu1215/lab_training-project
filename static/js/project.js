@@ -1306,7 +1306,7 @@ $(document).ready(function(){
 								total_len2 += len2[i];
 							}
 						}
-						if (type == "['Coding transcript']"){
+						if (type == "Coding transcript"){
 							var tooltipData2 = [];
 							for(var i = 0; i < len2.length; i++ ){
 								var color = "grey";
@@ -1567,7 +1567,7 @@ $(document).ready(function(){
 							{ title: 'Length'}
 						],
 					});
-					if(type == "['Coding transcript']"){
+					if(type == "Coding transcript"){
 
 						$("#table3_title").text("Conceptual translation")
 						$("#table3_title").addClass("alert alert-success")
